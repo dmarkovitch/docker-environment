@@ -1,0 +1,84 @@
+version: "3.7"
+
+services:
+    mongodb:
+        image: mongo:${mongo_version:-3.6.3}
+        container_name: ${mongo_container_name:-mongodb}
+        ports:
+            - '${mongo_port:-27017}:27017'
+        networks:
+            - local-dev
+        volumes:
+            - ${mongo_volume_source:-mongo_data}:/data/db
+        restart: ${mongo_container_restart:-no}
+
+    mssql:
+        image: mcr.microsoft.com/mssql/server:${mssql_version:-2017-latest-ubuntu}
+        container_name: ${mssql_container_name:-mssql}
+        ports:
+            - '${mssql_port:-1433}:1433'
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=${mssql_environment_password}
+        networks:
+            - local-dev
+        volumes:
+            - ${mssql_volume_source_sysdb:-mssql_data}:/var/opt/mssql/data
+            - ${mssql_volume_source_appdb:-mssql_data}:/var/opt/sqlserver
+        restart: ${mssql_container_restart:-no}
+
+    redis:
+        image: redis:${redis_version:-4}
+        container_name: ${redis_container_name:-redis}
+        ports:
+            - '${redis_port:-6379}:6379'
+        networks:
+            - local-dev
+        volumes:
+            - ${redis_volume_source:-redis_data}:/data
+        restart: ${redis_container_restart:-no}
+
+    rabbitmq:
+        image: rabbitmq:${rabbit_version:-3.6.5-management}
+        container_name: ${rabbit_container_name:-rabbitmq}
+        hostname: rabbitmq
+        ports:
+            - '${rabbit_admin_port:-15672}:15672'
+            - '${rabbit_port:-5672}:5672'
+        # environment:
+        #      - RABBITMQ_DEFAULT_USER=${rabbit_environment_user:-admin}
+        #      - RABBITMQ_DEFAULT_PASS=${rabbit_environment_password:-set_this_password1234}
+        networks:
+            - local-dev
+        volumes:
+            - ${rabbit_volume_source:-rabbit_data}:/var/lib/rabbitmq
+        restart: ${rabbit_container_restart:-no}
+
+    seq:
+        image: datalust/seq:${seq_version:-latest}
+        container_name: ${seq_container_name:-seq}
+        ports:
+            - '${seq_port:-1458}:80'
+        environment:
+            - ACCEPT_EULA=Y
+        networks:
+            - local-dev
+        volumes:
+            - ${seq_volume_source:-seq_data}:/data
+        restart: ${seq_container_restart:-no}        
+
+volumes:
+    mongo_data:
+        external: true
+    mssql_data:
+        external: true
+    redis_data:
+        external: true
+    rabbit_data:
+        external: true
+    seq_data:
+        external: true
+
+networks:
+    local-dev:
+        name: local-dev
