@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:${MONGO_VERSION:-7.0}
+    image: mongo:${MONGO_VERSION:-8.0}
     container_name: ${MONGO_CONTAINER_NAME:-mongodb}
     ports:
       - '${MONGO_PORT:-27017}:27017'
